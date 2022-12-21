@@ -104,6 +104,8 @@ SELECT * FROM funcionario;
 ---------------------------------------------------------------------
 -- CHAMADOS
 ---------------------------------------------------------------------
+DROP TABLE CHAMADO;
+
 CREATE TABLE chamado(
     id_chamado INTEGER NOT NULL,
     id_funcionario INTEGER NOT NULL,
@@ -119,9 +121,17 @@ FOREIGN KEY(id_cliente)REFERENCES cliente(id_cliente);
 ALTER TABLE chamado ADD CONSTRAINT id_funcionario_fk
 FOREIGN KEY(id_funcionario)REFERENCES funcionario(id_funcionario);
 
+CREATE SEQUENCE sequence_chamado INCREMENT BY 1 START WITH 1;
+
+CREATE OR REPLACE TRIGGER trigger_chamado
+    BEFORE INSERT ON chamado
+    FOR EACH ROW
+    BEGIN
+    SELECT sequence_chamado.NEXTVAL INTO :NEW.id_chamado FROM DUAL;
+END;
+
 INSERT INTO chamado(id_chamado,id_funcionario,id_cliente,data_chamado,descricao)
 VALUES(1,1,1,SYSDATE,'preciso que vejam minha rede');
-
 
 SELECT chamado.id_chamado, cliente.id_cliente,cliente.nome
 FROM chamado
