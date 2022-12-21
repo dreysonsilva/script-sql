@@ -1,0 +1,131 @@
+---------------------------------------------------------------------
+-- CLIENTES
+---------------------------------------------------------------------
+CREATE TABLE cliente(    
+    id_cliente INTEGER NOT NULL,
+    nome VARCHAR(60)NOT NULL,
+    cnpj INTEGER NOT NULL,
+    CONSTRAINT id_cliente_pk PRIMARY KEY(id_cliente)ENABLE
+);
+
+CREATE SEQUENCE sequence_cliente INCREMENT BY 1 START WITH 1;
+
+CREATE OR REPLACE TRIGGER trigger_cliente
+    BEFORE INSERT ON cliente
+    FOR EACH ROW
+    BEGIN
+    SELECT sequence_cliente.NEXTVAL INTO :NEW.id_cliente FROM DUAL;
+END;
+
+INSERT INTO cliente(nome,cnpj)VALUES('TOP FILE REDs', '000100245698');
+INSERT INTO cliente(nome,cnpj)VALUES('BL MUSIC', '523446659411');
+INSERT INTO cliente(nome,cnpj)VALUES('CANDI LTP', '6589412214');
+
+SELECT id_cliente,nome,cnpj FROM cliente;
+
+UPDATE cliente SET nome = 'BL MUSICAL' WHERE id_cliente = 2;
+
+DELETE FROM cliente;
+DELETE FROM cliente WHERE cnpj='523446659411';
+
+
+---------------------------------------------------------------------
+-- TIPO_FUNCIONARIO
+---------------------------------------------------------------------
+CREATE TABLE tipo_funcionario(
+    id_tf INTEGER NOT NULL,
+    descricao VARCHAR(60) NOT NULL,
+    CONSTRAINT id_tf_pk PRIMARY KEY(id_tf) 
+);
+
+CREATE SEQUENCE sequence_tf INCREMENT BY 1 START WITH 1;
+
+CREATE OR REPLACE TRIGGER trigger_tf
+    BEFORE INSERT ON tipo_funcionario
+    FOR EACH ROW
+    BEGIN
+    SELECT sequence_tf.NEXTVAL INTO :NEW.id_tf FROM DUAL;
+END;
+
+INSERT INTO tipo_funcionario(descricao)VALUES('SUPORTE NIVEL I');
+INSERT INTO tipo_funcionario(descricao)VALUES('SUPORTE SÊNIO');
+INSERT INTO tipo_funcionario(descricao)VALUES('ANALISTA DE SUPORTE');
+
+UPDATE tipo_funcionario SET descricao = 'SUPORTE NIVEL II' WHERE id_tf = 2;
+
+DELETE FROM tipo_funcionario WHERE id_tf=1;
+DELETE FROM tipo_funcionario WHERE descricao='ANALISTA DE SUPORTE';
+
+SELECT * FROM tipo_funcionario;
+
+
+---------------------------------------------------------------------
+-- FUNCIONARIOS
+---------------------------------------------------------------------
+CREATE TABLE funcionario(
+    id_funcionario INTEGER NOT NULL,
+    nome VARCHAR2(50),
+    email VARCHAR2(60) NOT NULL,
+    ativo CHAR(1) NOT NULL,
+    data_cadastrado DATE,
+    id_tf INTEGER NOT NULL,
+    CONSTRAINT id_funcionario_pk PRIMARY KEY(id_funcionario)
+);
+
+ALTER TABLE funcionario ADD CONSTRAINT id_tf_fk
+FOREIGN KEY(id_tf)REFERENCES funcionario(id_funcionario);
+
+CREATE SEQUENCE sequence_funcionario INCREMENT BY 1 START WITH 1;
+
+CREATE OR REPLACE TRIGGER trigger_funcionario
+    BEFORE INSERT ON funcionario
+    FOR EACH ROW
+    BEGIN
+    SELECT sequence_funcionario.NEXTVAL INTO :NEW.id_funcionario FROM DUAL;
+END;
+
+INSERT INTO funcionario(nome,email,ativo,data_cadastrado,id_tf)
+VALUES('Dreyson','dreysoninformar@gmail.com','s',SYSDATE,1);
+
+INSERT INTO funcionario(nome,email,ativo,data_cadastrado,id_tf)
+VALUES('Gustavo','gustavo.silva@gmail.com','n',SYSDATE,1);
+
+INSERT INTO funcionario(nome,email,ativo,data_cadastrado,id_tf)
+VALUES('Andre','andre.silva@gmail.com','s',SYSDATE,1);
+
+UPDATE tipo_funcionario SET descricao = 'SUPORTE NIVEL II' WHERE id_cliente = 2;
+
+DELETE FROM funcionario WHERE id_funcionario=1;
+DELETE FROM funcionario WHERE descricao='SUPORTE NIVEL I';
+
+SELECT * FROM funcionario;
+
+
+---------------------------------------------------------------------
+-- CHAMADOS
+---------------------------------------------------------------------
+CREATE TABLE chamado(
+    id_chamado INTEGER NOT NULL,
+    id_funcionario INTEGER NOT NULL,
+    id_cliente INTEGER NOT NULL,
+    data_chamado DATE NOT NULL,
+    descricao VARCHAR2(60) NOT NULL,
+    CONSTRAINT id_chamado_pk PRIMARY KEY(id_chamado) ENABLE
+);
+
+ALTER TABLE chamado ADD CONSTRAINT id_cliente_fk
+FOREIGN KEY(id_cliente)REFERENCES cliente(id_cliente);
+
+ALTER TABLE chamado ADD CONSTRAINT id_funcionario_fk
+FOREIGN KEY(id_funcionario)REFERENCES funcionario(id_funcionario);
+
+INSERT INTO chamado(id_chamado,id_funcionario,id_cliente,data_chamado,descricao)
+VALUES(1,1,1,SYSDATE,'preciso que vejam minha rede');
+
+
+SELECT chamado.id_chamado, cliente.id_cliente,cliente.nome
+FROM chamado
+JOIN cliente
+ON  chamado.id_chamado = cliente.id_cliente;
+
+
